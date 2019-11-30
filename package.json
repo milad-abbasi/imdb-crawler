@@ -7,7 +7,15 @@
     "start": "node app.js"
   },
   "repository": "github:milad-abbasi/imdb-crawler",
-  "keywords": ["crawler", "spider", "scraper"],
+  "keywords": [
+    "crawler",
+    "spider",
+    "scraper"
+  ],
   "author": "Milad Abbasi <miladabbasi1997@gmail.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "cheerio": "^1.0.0-rc.3"
+  }
 }
