@@ -1,7 +1,7 @@
 {
   "name": "imdb-crawler",
   "version": "1.0.0",
-  "description": "Crawl IMDB for extracting movies name",
+  "description": "Crawl IMDB for extracting movie details",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
