@@ -1,10 +1,6 @@
-const axios = require('axios');
 const cheerio = require('cheerio');
 
-axios.defaults.timeout = 5000;
-axios.defaults.headers.common['Accept-Language'] = 'en-US,en;q=0.5';
-
-const imdbUrl = 'https://imdb.com/title';
+const axios = require('./axios');
 
 class IMDBCrawler {
   constructor(seedUrls) {
@@ -31,8 +27,8 @@ class IMDBCrawler {
     return moviesLinks;
   }
 
-  async extractMovieDetails(url) {
-    const { data } = await axios.get(url);
+  async extractMovieDetails(movieId) {
+    const { data } = await axios.get(`/title/${movieId}`);
     const $ = cheerio.load(data);
     const content = $('#content-2-wide');
     const details = {};
@@ -92,7 +88,7 @@ class IMDBCrawler {
   }
 
   async crawl() {
-    const movieLinks = [];
+    const movieIDs = [];
     const movieDetails = [];
 
     let seedUrl;
@@ -102,29 +98,27 @@ class IMDBCrawler {
         console.log(`Extracting links from: ${seedUrl}`);
         const links = await this.extractMoviesLinks(seedUrl);
 
-        movieLinks.push(...links);
+        movieIDs.push(...links);
       } catch (err) {
         console.error(err.message);
         this.seedUrls.push(seedUrl);
       }
     }
 
-    console.log(`Found ${movieLinks.length} links...`);
+    console.log(`Found ${movieIDs.length} links...`);
 
     let movieLink;
-    while (movieLinks.length) {
+    while (movieIDs.length) {
       try {
-        movieLink = movieLinks.shift();
+        movieLink = movieIDs.shift();
         console.log(`Requesting ${movieLink}...`);
-        const details = await this.extractMovieDetails(
-          `${imdbUrl}/${movieLink}`
-        );
+        const details = await this.extractMovieDetails(movieLink);
 
         console.log('Got: ', details);
         movieDetails.push(details);
       } catch (err) {
         console.error(err.message);
-        movieLinks.push(movieLink);
+        movieIDs.push(movieLink);
       }
     }
 
