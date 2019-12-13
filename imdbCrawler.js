@@ -1,6 +1,7 @@
 const cheerio = require('cheerio');
 
 const axios = require('./axios');
+const esClient = require('./elasticsearch');
 
 class IMDBCrawler {
   constructor(seedUrls) {
@@ -34,10 +35,10 @@ class IMDBCrawler {
     const details = {};
 
     const titleAndYear = content.find('#titleYear').parent();
-    details.year = titleAndYear.find('a').text();
+    details.year = Number(titleAndYear.find('a').text());
     titleAndYear.find('#titleYear').remove();
     details.name = titleAndYear.text().trim();
-    details.rating = content.find('div.ratingValue strong span').text();
+    details.rating = Number(content.find('div.ratingValue strong span').text());
 
     const summary = content.find('div.plot_summary');
     details.summary = summary
@@ -66,11 +67,7 @@ class IMDBCrawler {
       if (i !== stars.length - 1) details.stars.push($(element).text());
     });
 
-    details.metascore = content.find('.metacriticScore span').text();
-    details.storyLine = content
-      .find('#titleStoryLine p')
-      .text()
-      .trim();
+    details.metascore = Number(content.find('.metacriticScore span').text());
 
     details.genres = [];
     const genres = content
@@ -87,7 +84,7 @@ class IMDBCrawler {
     return details;
   }
 
-  async crawl() {
+  async crawlAndIndex() {
     const movieIDs = [];
     const movieDetails = [];
 
@@ -107,18 +104,25 @@ class IMDBCrawler {
 
     console.log(`Found ${movieIDs.length} links...`);
 
-    let movieLink;
+    let movieID;
     while (movieIDs.length) {
       try {
-        movieLink = movieIDs.shift();
-        console.log(`Requesting ${movieLink}...`);
-        const details = await this.extractMovieDetails(movieLink);
+        movieID = movieIDs.shift();
+        console.log(`Requesting ${movieID}...`);
+        const details = await this.extractMovieDetails(movieID);
 
         console.log('Got: ', details);
+        await esClient.index({
+          index: 'movies',
+          id: movieID.substring(2),
+          body: details
+        });
+
+        console.log(movieID, 'Indexed');
         movieDetails.push(details);
       } catch (err) {
         console.error(err.message);
-        movieIDs.push(movieLink);
+        movieIDs.push(movieID);
       }
     }
 

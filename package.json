@@ -4,7 +4,7 @@
   "description": "Crawl IMDB for extracting movie details",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node -r dotenv/config app.js"
   },
   "repository": "github:milad-abbasi/imdb-crawler",
   "keywords": [
@@ -15,7 +15,9 @@
   "author": "Milad Abbasi <miladabbasi1997@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^7.5.0",
     "axios": "^0.19.0",
-    "cheerio": "^1.0.0-rc.3"
+    "cheerio": "^1.0.0-rc.3",
+    "dotenv": "^8.2.0"
   }
 }
