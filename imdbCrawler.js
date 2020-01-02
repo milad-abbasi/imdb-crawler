@@ -39,6 +39,7 @@ class IMDBCrawler {
     titleAndYear.find('#titleYear').remove();
     details.name = titleAndYear.text().trim();
     details.rating = Number(content.find('div.ratingValue strong span').text());
+    details.image = content.find('div.poster a img').attr('src');
 
     const summary = content.find('div.plot_summary');
     details.summary = summary
