@@ -4,8 +4,20 @@ const axios = require('./axios');
 const esClient = require('./elasticsearch');
 
 class IMDBCrawler {
-  constructor(seedUrls) {
-    this.seedUrls = seedUrls;
+  constructor(url) {
+    const seedUrls = [
+      'movies-coming-soon',
+      'movies-in-theaters',
+      'chart/top',
+      'chart/boxoffice',
+      'chart/moviemeter',
+      'chart/top-english-movies',
+      'chart/tvmeter',
+      'chart/toptv',
+      'chart/bottom'
+    ];
+
+    this.seedUrls = seedUrls.map(seedUrl => `${url}/${seedUrl}`);
   }
 
   async extractMoviesLinks(url) {

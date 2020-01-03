@@ -1,10 +1,6 @@
 const ImdbCrawler = require('./imdbCrawler');
 
-const imdbCrawler = new ImdbCrawler([
-  'https://www.imdb.com/movies-in-theaters',
-  'https://www.imdb.com/movies-coming-soon',
-  'https://www.imdb.com/chart/top'
-]);
+const imdbCrawler = new ImdbCrawler('https://www.imdb.com');
 
 async function start() {
   const res = await imdbCrawler.crawlAndIndex();
