@@ -1,4 +1,5 @@
 const cheerio = require('cheerio');
+const url = require('url');
 
 const axios = require('./axios');
 const esClient = require('./elasticsearch');
@@ -20,20 +21,18 @@ class IMDBCrawler {
     this.seedUrls = seedUrls.map(seedUrl => `${url}/${seedUrl}`);
   }
 
-  async extractMoviesLinks(url) {
-    const { data } = await axios.get(url);
+  async extractMoviesLinks(seedUrl) {
+    const { data } = await axios.get(seedUrl);
     const $ = cheerio.load(data);
     const moviesLinks = [];
 
     $('#main a[title]').each((i, element) => {
-      const link = $(element).attr('href');
+      const link = url.parse($(element).attr('href'));
       const title = $(element).attr('title');
-      const linkParts = link.split('/', 3);
+      const linkPaths = link.pathname.split('/').filter(Boolean);
 
-      if (linkParts[1] === 'title' && title !== 'Delete') {
-        const movieId = linkParts[2];
-
-        moviesLinks.push(movieId);
+      if (linkPaths[0] === 'title' && title !== 'Delete') {
+        moviesLinks.push(linkPaths[1]);
       }
     });
 
